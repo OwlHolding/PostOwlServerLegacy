@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	fasthttp "github.com/valyala/fasthttp"
 )
 
 type ServerConfig struct {
@@ -19,6 +18,7 @@ type ServerConfig struct {
 }
 
 var BotAPI *tgbotapi.BotAPI
+var WebhookPath string
 
 func LoadConfig(path string) ServerConfig {
 	byte_config, err := os.ReadFile(path)
@@ -51,14 +51,19 @@ func CreateBot(config ServerConfig) *tgbotapi.BotAPI {
 
 func InitBot(config ServerConfig) {
 	BotAPI = CreateBot(config)
+	WebhookPath = "/" + config.Token
 }
 
-func ProcessRequest(writer http.ResponseWriter, request *http.Request) {
-	update, err := BotAPI.HandleUpdate(request)
-	if err != nil {
-		fmt.Fprint(writer, err.Error())
-		return
+func ProcessRequest(ctx *fasthttp.RequestCtx) {
+	if string(ctx.Path()) != WebhookPath {
+		ctx.Error("", fasthttp.StatusForbidden)
+	} else {
+		var update tgbotapi.Update
+		err := json.Unmarshal(ctx.PostBody(), &update)
+		if err != nil {
+			ctx.Error("", fasthttp.StatusBadRequest)
+			return
+		}
+		go BotAPI.Send(tgbotapi.NewMessage(update.Message.From.ID, update.Message.Text))
 	}
-
-	go BotAPI.Send(tgbotapi.NewMessage(update.Message.From.ID, update.Message.Text))
 }

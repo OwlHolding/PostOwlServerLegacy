@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 func main() {
@@ -10,10 +11,9 @@ func main() {
 
 	InitBot(config)
 
-	http.HandleFunc("/"+config.Token, ProcessRequest)
-
 	log.Print("Server started")
 
-	err := http.ListenAndServeTLS(":"+config.Port, config.CertFile, config.KeyFile, nil)
+	err := fasthttp.ListenAndServeTLS(":"+config.Port, config.CertFile, config.KeyFile,
+		ProcessRequest)
 	log.Fatal(err)
 }
