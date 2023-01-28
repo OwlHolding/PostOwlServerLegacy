@@ -3,35 +3,13 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	fasthttp "github.com/valyala/fasthttp"
 )
 
-type ServerConfig struct {
-	Token    string
-	Url      string
-	Port     string
-	CertFile string
-	KeyFile  string
-}
-
 var BotAPI *tgbotapi.BotAPI
 var WebhookPath string
-
-func LoadConfig(path string) ServerConfig {
-	byte_config, err := os.ReadFile(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var config ServerConfig
-	err = json.Unmarshal(byte_config, &config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return config
-}
 
 func CreateBot(config ServerConfig) *tgbotapi.BotAPI {
 	bot, err := tgbotapi.NewBotAPI(config.Token)

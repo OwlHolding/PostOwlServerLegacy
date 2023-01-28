@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	config := LoadConfig("config.json")
+	config := LoadConfigFromEnv("POSTOWLCONFIG")
 
 	InitBot(config)
 
