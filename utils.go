@@ -12,6 +12,7 @@ type ServerConfig struct {
 	Port     string
 	CertFile string
 	KeyFile  string
+	RedisUrl string
 }
 
 func LoadConfig(path string) ServerConfig {
