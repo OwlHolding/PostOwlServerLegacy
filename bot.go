@@ -16,28 +16,24 @@ var WebhookPath string
 var MainCtx context.Context
 var RedisClient *redis.Client
 
-func CreateBot(config ServerConfig) *tgbotapi.BotAPI {
+func InitBot(config ServerConfig) {
+	WebhookPath = "/" + config.Token
+
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	webhook, _ := tgbotapi.NewWebhookWithCert(config.Url+":"+config.Port+"/"+bot.Token,
+	webhook, _ := tgbotapi.NewWebhookWithCert(config.Url+":"+config.Port+WebhookPath,
 		tgbotapi.FilePath(config.CertFile))
 	_, err = bot.Request(webhook)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return bot
-}
-
-func InitBot(config ServerConfig) {
-	BotAPI = CreateBot(config)
-	WebhookPath = "/" + config.Token
 	MainCtx = context.Background()
 	RedisClient = redis.NewClient(&redis.Options{Addr: config.RedisUrl})
-	_, err := RedisClient.Ping(MainCtx).Result()
+	_, err = RedisClient.Ping(MainCtx).Result()
 	if err != nil {
 		log.Fatal(err)
 	}
