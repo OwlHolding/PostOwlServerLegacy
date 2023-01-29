@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 
+	_ "github.com/go-sql-driver/mysql"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	redis "github.com/redis/go-redis/v9"
 	fasthttp "github.com/valyala/fasthttp"
@@ -15,6 +17,7 @@ var BotAPI *tgbotapi.BotAPI
 var WebhookPath string
 var MainCtx context.Context
 var RedisClient *redis.Client
+var MySqlClient *sql.DB
 
 func InitBot(config ServerConfig) {
 	WebhookPath = "/" + config.Token
@@ -37,6 +40,13 @@ func InitBot(config ServerConfig) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	MySqlClient, err = sql.Open("mysql", config.SqlUser+":"+config.SqlPass+"@/postowl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	MySqlClient.SetMaxOpenConns(config.MaxUsers)
+	MySqlClient.SetMaxIdleConns(config.MaxUsers / 10)
 }
 
 func ProcessRequest(ctx *fasthttp.RequestCtx) {

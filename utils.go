@@ -13,6 +13,9 @@ type ServerConfig struct {
 	CertFile string
 	KeyFile  string
 	RedisUrl string
+	SqlUser  string
+	SqlPass  string
+	MaxUsers int
 }
 
 func LoadConfig(path string) ServerConfig {
