@@ -7,15 +7,16 @@ import (
 )
 
 type ServerConfig struct {
-	Token    string
-	Url      string
-	Port     string
-	CertFile string
-	KeyFile  string
-	RedisUrl string
-	SqlUser  string
-	SqlPass  string
-	MaxUsers int
+	Token           string
+	Url             string
+	Port            string
+	CertFile        string
+	KeyFile         string
+	RedisUrl        string
+	SqlUser         string
+	SqlPass         string
+	MaxSqlConns     int
+	MaxSqlIdleConns int
 }
 
 func LoadConfig(path string) ServerConfig {
