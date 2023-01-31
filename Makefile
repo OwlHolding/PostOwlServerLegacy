@@ -1,2 +1,2 @@
 all:
-	@go build -o bin/postowlserver main.go bot.go utils.go
+	@go build -o bin/postowlserver main.go bot.go config.go
